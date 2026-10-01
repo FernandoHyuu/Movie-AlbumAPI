@@ -1,0 +1,50 @@
+# ---------- .NET ----------
+bin/
+obj/
+*.user
+*.suo
+*.userprefs
+.vs/
+*.swp
+
+# Build results
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+[Bb]in/
+[Oo]bj/
+
+# ASP.NET / EF
+appsettings.*.local.json
+*.db
+*.db-shm
+*.db-wal
+
+# User secrets
+secrets.json
+
+# ---------- Angular / Node ----------
+node_modules/
+dist/
+.angular/
+npm-debug.log*
+yarn-error.log*
+*.tsbuildinfo
+
+# Environment files (keep examples, ignore real)
+**/environment.local.ts
+.env
+.env.local
+
+# ---------- Docker ----------
+# (compose files are tracked; local overrides are not)
+docker-compose.override.yml
+
+# ---------- IDE ----------
+.idea/
+*.sln.iml
+
+# ---------- OS ----------
+.DS_Store
+Thumbs.db
