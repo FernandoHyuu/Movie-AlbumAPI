@@ -1,0 +1,131 @@
+<section class="admin-section" aria-labelledby="movies-heading">
+  <h2 id="movies-heading" class="admin-section__heading">Movies</h2>
+
+  <form class="admin-form" [formGroup]="form" (ngSubmit)="submit()">
+    <h3 class="admin-form__title">{{ isEditing() ? 'Edit movie' : 'New movie' }}</h3>
+
+    <div class="admin-form__grid">
+      <label class="admin-field">
+        <span class="admin-field__label">Title</span>
+        <input
+          type="text"
+          formControlName="title"
+          class="admin-field__input"
+          [attr.aria-invalid]="isInvalid('title') ? 'true' : null"
+        />
+        @if (isInvalid('title')) {
+          <span class="admin-field__error" role="alert">Title is required (max 200 characters).</span>
+        }
+      </label>
+
+      <label class="admin-field">
+        <span class="admin-field__label">Studio</span>
+        <input
+          type="text"
+          formControlName="studio"
+          class="admin-field__input"
+          [attr.aria-invalid]="isInvalid('studio') ? 'true' : null"
+        />
+        @if (isInvalid('studio')) {
+          <span class="admin-field__error" role="alert">Studio must be at most 200 characters.</span>
+        }
+      </label>
+
+      <label class="admin-field">
+        <span class="admin-field__label">Release year</span>
+        <input
+          type="number"
+          formControlName="releaseYear"
+          class="admin-field__input"
+          [attr.aria-invalid]="isInvalid('releaseYear') ? 'true' : null"
+        />
+        @if (isInvalid('releaseYear')) {
+          <span class="admin-field__error" role="alert">Release year must be between 1888 and 2100.</span>
+        }
+      </label>
+
+      <label class="admin-field">
+        <span class="admin-field__label">Main actors (comma-separated)</span>
+        <input type="text" formControlName="mainActors" class="admin-field__input" />
+      </label>
+
+      <label class="admin-field">
+        <span class="admin-field__label">Cover image (JPEG/PNG, ≤5 MB)</span>
+        <input
+          type="file"
+          accept="image/jpeg,image/png"
+          class="admin-field__input"
+          (change)="onFileSelected($event)"
+        />
+        @if (coverError()) {
+          <span class="admin-field__error" role="alert">{{ coverError() }}</span>
+        } @else if (selectedFile()) {
+          <span class="admin-field__hint">{{ selectedFile()!.name }}</span>
+        }
+      </label>
+    </div>
+
+    <div class="admin-form__actions">
+      <button type="submit" class="admin-btn admin-btn--primary" [disabled]="saving()">
+        {{ saving() ? 'Saving…' : isEditing() ? 'Update' : 'Create' }}
+      </button>
+      @if (isEditing()) {
+        <button type="button" class="admin-btn" (click)="resetForm()">Cancel</button>
+      }
+    </div>
+  </form>
+
+  @if (loading()) {
+    <p class="admin-table__status" role="status">Loading…</p>
+  } @else if (items().length === 0) {
+    <p class="admin-table__status" role="status">No movies found.</p>
+  } @else {
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th scope="col">Title</th>
+          <th scope="col">Studio</th>
+          <th scope="col">Year</th>
+          <th scope="col">Cover</th>
+          <th scope="col">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (movie of items(); track movie.id) {
+          <tr>
+            <td>{{ movie.title }}</td>
+            <td>{{ movie.studio || '—' }}</td>
+            <td>{{ movie.releaseYear }}</td>
+            <td>{{ movie.hasCover ? 'Yes' : 'No' }}</td>
+            <td class="admin-table__actions">
+              <button type="button" class="admin-btn admin-btn--ghost" (click)="edit(movie)">Edit</button>
+              <button
+                type="button"
+                class="admin-btn admin-btn--danger"
+                [disabled]="saving()"
+                (click)="remove(movie)"
+              >
+                Delete
+              </button>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+
+    <nav class="admin-pager" aria-label="Movies pages">
+      <button type="button" class="admin-btn" [disabled]="page() <= 1" (click)="goToPage(page() - 1)">
+        Previous
+      </button>
+      <span class="admin-pager__status">Page {{ page() }} of {{ totalPages() }}</span>
+      <button
+        type="button"
+        class="admin-btn"
+        [disabled]="page() >= totalPages()"
+        (click)="goToPage(page() + 1)"
+      >
+        Next
+      </button>
+    </nav>
+  }
+</section>

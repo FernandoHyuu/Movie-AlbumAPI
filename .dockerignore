@@ -1,0 +1,32 @@
+# Keep the Docker build context small and secret-free.
+
+# .NET build output
+**/bin/
+**/obj/
+
+# Node / Angular (frontend is not part of the API image)
+**/node_modules/
+**/dist/
+**/.angular/
+
+# Environment & secrets
+.env
+.env.local
+**/appsettings.*.local.json
+secrets.json
+
+# VCS & IDE
+.git/
+.gitignore
+.vs/
+.idea/
+
+# Docker artifacts
+Dockerfile
+docker-compose*.yml
+.dockerignore
+
+# Specs / docs not needed at build time
+.kiro/
+*.md
+LICENSE

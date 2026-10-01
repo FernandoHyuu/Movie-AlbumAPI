@@ -1,0 +1,177 @@
+<section class="admin-section" aria-labelledby="persons-heading">
+  <h2 id="persons-heading" class="admin-section__heading">Persons</h2>
+
+  <!-- Create / update form -->
+  <form class="admin-form" [formGroup]="form" (ngSubmit)="submit()">
+    <h3 class="admin-form__title">{{ isEditing() ? 'Edit person' : 'New person' }}</h3>
+
+    <div class="admin-form__grid">
+      <label class="admin-field">
+        <span class="admin-field__label">Name</span>
+        <input
+          type="text"
+          formControlName="name"
+          class="admin-field__input"
+          [attr.aria-invalid]="isInvalid('name') ? 'true' : null"
+        />
+        @if (isInvalid('name')) {
+          <span class="admin-field__error" role="alert">Name is required (max 500 characters).</span>
+        }
+      </label>
+
+      <label class="admin-field">
+        <span class="admin-field__label">Email</span>
+        <input
+          type="email"
+          formControlName="email"
+          class="admin-field__input"
+          [attr.aria-invalid]="isInvalid('email') ? 'true' : null"
+        />
+        @if (isInvalid('email')) {
+          <span class="admin-field__error" role="alert">Enter a valid email (5–254 characters).</span>
+        }
+      </label>
+
+      <label class="admin-field">
+        <span class="admin-field__label">Role</span>
+        <select
+          formControlName="role"
+          class="admin-field__input"
+          [attr.aria-invalid]="isInvalid('role') ? 'true' : null"
+        >
+          @for (role of roleOptions; track role) {
+            <option [value]="role">{{ role }}</option>
+          }
+        </select>
+        @if (isInvalid('role')) {
+          <span class="admin-field__error" role="alert">Select a valid role.</span>
+        }
+      </label>
+
+      <label class="admin-field">
+        <span class="admin-field__label">
+          Password {{ isEditing() ? '(leave blank to keep)' : '' }}
+        </span>
+        <input
+          type="password"
+          formControlName="password"
+          autocomplete="new-password"
+          class="admin-field__input"
+          [attr.aria-invalid]="isInvalid('password') ? 'true' : null"
+        />
+        @if (isInvalid('password')) {
+          <span class="admin-field__error" role="alert">Password must be 8–128 characters.</span>
+        }
+      </label>
+    </div>
+
+    <!-- Addresses (0–10) -->
+    <fieldset class="admin-subform" formArrayName="addresses">
+      <legend>Addresses ({{ addresses.length }}/10)</legend>
+      @for (group of addresses.controls; track group; let i = $index) {
+        <div class="admin-subform__row" [formGroupName]="i">
+          <input type="text" formControlName="street" placeholder="Street" class="admin-field__input" />
+          <input type="text" formControlName="city" placeholder="City" class="admin-field__input" />
+          <input type="text" formControlName="state" placeholder="State" class="admin-field__input" />
+          <input type="text" formControlName="zipCode" placeholder="Zip" class="admin-field__input" />
+          <button type="button" class="admin-btn admin-btn--ghost" (click)="removeAddress(i)">Remove</button>
+        </div>
+      }
+      <button
+        type="button"
+        class="admin-btn admin-btn--ghost"
+        [disabled]="addresses.length >= 10"
+        (click)="addAddress()"
+      >
+        Add address
+      </button>
+    </fieldset>
+
+    <!-- Phones (0–10) -->
+    <fieldset class="admin-subform" formArrayName="phones">
+      <legend>Phones ({{ phones.length }}/10)</legend>
+      @for (group of phones.controls; track group; let i = $index) {
+        <div class="admin-subform__row" [formGroupName]="i">
+          <input type="text" formControlName="number" placeholder="Number" class="admin-field__input" />
+          <input type="text" formControlName="type" placeholder="Type" class="admin-field__input" />
+          <button type="button" class="admin-btn admin-btn--ghost" (click)="removePhone(i)">Remove</button>
+        </div>
+      }
+      <button
+        type="button"
+        class="admin-btn admin-btn--ghost"
+        [disabled]="phones.length >= 10"
+        (click)="addPhone()"
+      >
+        Add phone
+      </button>
+    </fieldset>
+
+    <div class="admin-form__actions">
+      <button type="submit" class="admin-btn admin-btn--primary" [disabled]="saving()">
+        {{ saving() ? 'Saving…' : isEditing() ? 'Update' : 'Create' }}
+      </button>
+      @if (isEditing()) {
+        <button type="button" class="admin-btn" (click)="resetForm()">Cancel</button>
+      }
+    </div>
+  </form>
+
+  <!-- Table -->
+  @if (loading()) {
+    <p class="admin-table__status" role="status">Loading…</p>
+  } @else if (items().length === 0) {
+    <p class="admin-table__status" role="status">No persons found.</p>
+  } @else {
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th scope="col">Name</th>
+          <th scope="col">Email</th>
+          <th scope="col">Role</th>
+          <th scope="col">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (person of items(); track person.id) {
+          <tr>
+            <td>{{ person.name }}</td>
+            <td>{{ person.email }}</td>
+            <td>{{ person.role }}</td>
+            <td class="admin-table__actions">
+              <button type="button" class="admin-btn admin-btn--ghost" (click)="edit(person)">Edit</button>
+              <button
+                type="button"
+                class="admin-btn admin-btn--danger"
+                [disabled]="saving()"
+                (click)="remove(person)"
+              >
+                Delete
+              </button>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+
+    <nav class="admin-pager" aria-label="Persons pages">
+      <button
+        type="button"
+        class="admin-btn"
+        [disabled]="page() <= 1"
+        (click)="goToPage(page() - 1)"
+      >
+        Previous
+      </button>
+      <span class="admin-pager__status">Page {{ page() }} of {{ totalPages() }}</span>
+      <button
+        type="button"
+        class="admin-btn"
+        [disabled]="page() >= totalPages()"
+        (click)="goToPage(page() + 1)"
+      >
+        Next
+      </button>
+    </nav>
+  }
+</section>

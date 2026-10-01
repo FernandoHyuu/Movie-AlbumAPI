@@ -1,0 +1,41 @@
+.sidebar {
+  display: block;
+}
+
+.sidebar__menu {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.sidebar__item {
+  margin: 0;
+}
+
+.sidebar__link {
+  display: block;
+  padding: 0.75rem 1rem;
+  text-decoration: none;
+  color: inherit;
+}
+
+.sidebar__link--active {
+  font-weight: 600;
+}
+
+.sidebar__unauthorized {
+  padding: 0.75rem 1rem;
+  margin: 0;
+}
+
+.sidebar__logout {
+  display: block;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  text-align: left;
+  background: none;
+  border: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}

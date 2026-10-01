@@ -1,0 +1,74 @@
+:host {
+  display: block;
+}
+
+.layout {
+  min-height: 100vh;
+}
+
+.layout__bar {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+}
+
+.layout__toggle {
+  font-size: 1.25rem;
+  line-height: 1;
+  padding: 0.4rem 0.65rem;
+  cursor: pointer;
+  background: transparent;
+  border: 1px solid currentColor;
+  border-radius: 4px;
+}
+
+.layout__sidebar {
+  display: block;
+}
+
+.layout__content {
+  display: block;
+  padding: 1rem;
+}
+
+/*
+ * Mobile (< 768 px): the sidebar is collapsible and collapsed by default
+ * (R18.3). It is revealed only when expanded via the toggle (R18.4). The CSS
+ * drives visibility off the state class, so toggling never recreates DOM.
+ */
+.layout--mobile .layout__sidebar {
+  display: none;
+}
+
+.layout--mobile .layout__sidebar--expanded {
+  display: block;
+}
+
+/*
+ * Tablet (768–1023 px) and desktop (≥ 1024 px): the sidebar is always expanded
+ * and sits beside the content; the mobile toggle is not rendered (R18.1, R18.2).
+ * A sidebar column plus a flexible content column form the two-pane shell.
+ */
+@media (min-width: 768px) {
+  .layout {
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    grid-template-areas:
+      'bar bar'
+      'sidebar content';
+  }
+
+  .layout__bar {
+    grid-area: bar;
+  }
+
+  .layout__sidebar {
+    grid-area: sidebar;
+    display: block;
+  }
+
+  .layout__content {
+    grid-area: content;
+  }
+}

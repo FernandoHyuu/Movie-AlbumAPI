@@ -1,0 +1,5 @@
+/* You can add global styles to this file, and also import other style files */
+
+/* Shared responsive catalog-grid rules (R18.1–R18.3), applied via the
+   `.catalog-grid` class on any catalog card container (tasks 11.1, 12.2). */
+@import './app/shared/styles/catalog-grid.css';

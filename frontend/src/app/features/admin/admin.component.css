@@ -1,0 +1,184 @@
+.admin {
+  display: block;
+  padding: 1.5rem;
+  max-width: 72rem;
+  margin: 0 auto;
+}
+
+.admin__heading {
+  margin: 0 0 1rem;
+  font-size: 1.6rem;
+}
+
+.admin--denied {
+  text-align: center;
+}
+
+.admin__denied-message {
+  color: #b00020;
+  font-size: 1rem;
+}
+
+.admin__tabs {
+  display: flex;
+  gap: 0.5rem;
+  border-bottom: 1px solid #d0d0d0;
+  margin-bottom: 1.5rem;
+}
+
+.admin__tab {
+  padding: 0.6rem 1rem;
+  font: inherit;
+  background: none;
+  border: none;
+  border-bottom: 3px solid transparent;
+  cursor: pointer;
+}
+
+.admin__tab--active {
+  border-bottom-color: #1565c0;
+  font-weight: 600;
+}
+
+/* Sections, forms, tables shared by the entity management components. */
+.admin-section {
+  display: block;
+}
+
+.admin-section__heading {
+  margin: 0 0 1rem;
+  font-size: 1.25rem;
+}
+
+.admin-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+  border: 1px solid #e0e0e0;
+  border-radius: 0.5rem;
+}
+
+.admin-form__title {
+  margin: 0;
+  font-size: 1.05rem;
+}
+
+.admin-form__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+  gap: 1rem;
+}
+
+.admin-form__actions {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.admin-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.admin-field__label {
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.admin-field__input {
+  padding: 0.45rem 0.6rem;
+  font: inherit;
+}
+
+.admin-field__error {
+  color: #b00020;
+  font-size: 0.8rem;
+}
+
+.admin-field__hint {
+  color: #555;
+  font-size: 0.8rem;
+}
+
+.admin-subform {
+  border: 1px solid #e0e0e0;
+  border-radius: 0.4rem;
+  padding: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.admin-subform__row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.admin-btn {
+  padding: 0.45rem 0.9rem;
+  font: inherit;
+  cursor: pointer;
+  border: 1px solid #c0c0c0;
+  border-radius: 0.3rem;
+  background: #f5f5f5;
+}
+
+.admin-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.admin-btn--primary {
+  background: #1565c0;
+  color: #fff;
+  border-color: #1565c0;
+}
+
+.admin-btn--danger {
+  background: #fff;
+  color: #b00020;
+  border-color: #b00020;
+}
+
+.admin-btn--ghost {
+  background: none;
+  border-color: transparent;
+  color: #1565c0;
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 1rem;
+}
+
+.admin-table th,
+.admin-table td {
+  padding: 0.5rem 0.75rem;
+  text-align: left;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.admin-table__actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.admin-table__status {
+  color: #555;
+  padding: 1rem 0;
+}
+
+.admin-pager {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.admin-pager__status {
+  font-size: 0.9rem;
+}

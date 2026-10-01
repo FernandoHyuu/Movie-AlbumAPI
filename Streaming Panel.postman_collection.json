@@ -1,0 +1,475 @@
+{
+  "info": {
+    "name": "Streaming Panel",
+    "description": "Streaming Panel API — Movie & Album administration with JWT auth and role-based authorization. Folders mirror the endpoint groups (Auth, Persons, Movies, Albums). Login/refresh requests capture the access and refresh tokens into the active environment so protected requests reuse {{accessToken}} automatically.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      { "key": "token", "value": "{{accessToken}}", "type": "string" }
+    ]
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8080", "type": "string" }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "description": "Anonymous authentication endpoints: register, login, refresh-token.",
+      "item": [
+        {
+          "name": "Register",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"Password123!\",\n  \"role\": \"User_Full\",\n  \"name\": \"Sample User\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/register",
+              "host": [ "{{baseUrl}}" ],
+              "path": [ "api", "auth", "register" ]
+            },
+            "description": "Registers a new Person and issues a token pair (201). Duplicate email returns 409."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    var body = pm.response.json();",
+                  "    pm.environment.set('accessToken', body.accessToken);",
+                  "    pm.environment.set('refreshToken', body.refreshToken);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@example.com\",\n  \"password\": \"Password123!\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": [ "{{baseUrl}}" ],
+              "path": [ "api", "auth", "login" ]
+            },
+            "description": "Authenticates by email and password, issuing a token pair (200). Mismatch returns 401; database unavailable returns 503."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    var body = pm.response.json();",
+                  "    pm.environment.set('accessToken', body.accessToken);",
+                  "    pm.environment.set('refreshToken', body.refreshToken);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Refresh Token",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refreshToken\": \"{{refreshToken}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/refresh-token",
+              "host": [ "{{baseUrl}}" ],
+              "path": [ "api", "auth", "refresh-token" ]
+            },
+            "description": "Rotates the presented refresh token into a fresh token pair (200). Invalid token returns 401."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    var body = pm.response.json();",
+                  "    pm.environment.set('accessToken', body.accessToken);",
+                  "    pm.environment.set('refreshToken', body.refreshToken);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Persons",
+      "description": "Person administration (Admin only). CRUD over the Person aggregate (addresses/phones).",
+      "item": [
+        {
+          "name": "List Persons",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/persons?page=1&pageSize=50",
+              "host": [ "{{baseUrl}}" ],
+              "path": [ "api", "persons" ],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "pageSize", "value": "50" }
+              ]
+            },
+            "description": "Lists persons as a paged envelope (<=50/page)."
+          }
+        },
+        {
+          "name": "Get Person by Id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/persons/{{personId}}",
+              "host": [ "{{baseUrl}}" ],
+              "path": [ "api", "persons", "{{personId}}" ]
+            },
+            "description": "Reads a single person; unknown id returns 404."
+          }
+        },
+        {
+          "name": "Create Person",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Jane Doe\",\n  \"email\": \"jane@example.com\",\n  \"role\": \"User_Movie\",\n  \"password\": \"Password123!\",\n  \"addresses\": [\n    { \"street\": \"1 Main St\", \"city\": \"Springfield\", \"state\": \"IL\", \"zipCode\": \"62701\" }\n  ],\n  \"phones\": [\n    { \"number\": \"+1-555-0100\", \"type\": \"Mobile\" }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/persons",
+              "host": [ "{{baseUrl}}" ],
+              "path": [ "api", "persons" ]
+            },
+            "description": "Creates a person (201)."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    pm.environment.set('personId', pm.response.json().id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update Person",
+          "request": {
+            "method": "PUT",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Jane Doe\",\n  \"email\": \"jane@example.com\",\n  \"role\": \"User_Full\",\n  \"password\": null,\n  \"addresses\": [],\n  \"phones\": []\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/persons/{{personId}}",
+              "host": [ "{{baseUrl}}" ],
+              "path": [ "api", "persons", "{{personId}}" ]
+            },
+            "description": "Updates a person including its role (200); unknown id returns 404."
+          }
+        },
+        {
+          "name": "Delete Person",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/persons/{{personId}}",
+              "host": [ "{{baseUrl}}" ],
+              "path": [ "api", "persons", "{{personId}}" ]
+            },
+            "description": "Deletes a person and cascades its children (204); unknown id returns 404."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Movies",
+      "description": "Movie catalog. Reads require MovieAccess; writes and cover upload require Admin.",
+      "item": [
+        {
+          "name": "List Movies",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/movies?page=1&pageSize=100",
+              "host": [ "{{baseUrl}}" ],
+              "path": [ "api", "movies" ],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "pageSize", "value": "100" }
+              ]
+            },
+            "description": "Lists movies as a paged envelope (<=100/page)."
+          }
+        },
+        {
+          "name": "Get Movie by Id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/movies/{{movieId}}",
+              "host": [ "{{baseUrl}}" ],
+              "path": [ "api", "movies", "{{movieId}}" ]
+            },
+            "description": "Reads a single movie; unknown id returns 404."
+          }
+        },
+        {
+          "name": "Create Movie",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Blade Runner\",\n  \"studio\": \"Warner Bros.\",\n  \"releaseYear\": 1982,\n  \"mainActors\": [ \"Harrison Ford\", \"Rutger Hauer\" ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/movies",
+              "host": [ "{{baseUrl}}" ],
+              "path": [ "api", "movies" ]
+            },
+            "description": "Creates a movie (201)."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    pm.environment.set('movieId', pm.response.json().id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update Movie",
+          "request": {
+            "method": "PUT",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Blade Runner (Final Cut)\",\n  \"studio\": \"Warner Bros.\",\n  \"releaseYear\": 1982,\n  \"mainActors\": [ \"Harrison Ford\" ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/movies/{{movieId}}",
+              "host": [ "{{baseUrl}}" ],
+              "path": [ "api", "movies", "{{movieId}}" ]
+            },
+            "description": "Updates a movie (200); unknown id returns 404."
+          }
+        },
+        {
+          "name": "Delete Movie",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/movies/{{movieId}}",
+              "host": [ "{{baseUrl}}" ],
+              "path": [ "api", "movies", "{{movieId}}" ]
+            },
+            "description": "Deletes a movie (204); unknown id returns 404."
+          }
+        },
+        {
+          "name": "Get Movie Cover",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/movies/{{movieId}}/cover",
+              "host": [ "{{baseUrl}}" ],
+              "path": [ "api", "movies", "{{movieId}}", "cover" ]
+            },
+            "description": "Streams the stored cover bytes with their Content-Type; missing cover returns 404."
+          }
+        },
+        {
+          "name": "Upload Movie Cover",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "file", "type": "file", "src": [], "description": "Image file (image/jpeg|png|webp, <=5 MB)." }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/movies/{{movieId}}/cover",
+              "host": [ "{{baseUrl}}" ],
+              "path": [ "api", "movies", "{{movieId}}", "cover" ]
+            },
+            "description": "Stores (replaces) the cover from a multipart/form-data upload (204); missing record returns 404."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Albums",
+      "description": "Album catalog. Reads require AlbumAccess; writes and cover upload require Admin.",
+      "item": [
+        {
+          "name": "List Albums",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/albums?page=1&pageSize=50",
+              "host": [ "{{baseUrl}}" ],
+              "path": [ "api", "albums" ],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "pageSize", "value": "50" }
+              ]
+            },
+            "description": "Lists albums as a paged envelope (<=50/page)."
+          }
+        },
+        {
+          "name": "Get Album by Id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/albums/{{albumId}}",
+              "host": [ "{{baseUrl}}" ],
+              "path": [ "api", "albums", "{{albumId}}" ]
+            },
+            "description": "Reads a single album; unknown id returns 404."
+          }
+        },
+        {
+          "name": "Create Album",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"The Dark Side of the Moon\",\n  \"band\": \"Pink Floyd\",\n  \"releaseYear\": 1973,\n  \"genre\": \"Progressive Rock\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/albums",
+              "host": [ "{{baseUrl}}" ],
+              "path": [ "api", "albums" ]
+            },
+            "description": "Creates an album (201)."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    pm.environment.set('albumId', pm.response.json().id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update Album",
+          "request": {
+            "method": "PUT",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"The Dark Side of the Moon (Remastered)\",\n  \"band\": \"Pink Floyd\",\n  \"releaseYear\": 1973,\n  \"genre\": \"Progressive Rock\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/albums/{{albumId}}",
+              "host": [ "{{baseUrl}}" ],
+              "path": [ "api", "albums", "{{albumId}}" ]
+            },
+            "description": "Updates an album (200); unknown id returns 404."
+          }
+        },
+        {
+          "name": "Delete Album",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/albums/{{albumId}}",
+              "host": [ "{{baseUrl}}" ],
+              "path": [ "api", "albums", "{{albumId}}" ]
+            },
+            "description": "Deletes an album (204); unknown id returns 404."
+          }
+        },
+        {
+          "name": "Get Album Cover",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/albums/{{albumId}}/cover",
+              "host": [ "{{baseUrl}}" ],
+              "path": [ "api", "albums", "{{albumId}}", "cover" ]
+            },
+            "description": "Streams the stored cover bytes with their Content-Type; missing cover returns 404."
+          }
+        },
+        {
+          "name": "Upload Album Cover",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "file", "type": "file", "src": [], "description": "Image file (image/jpeg|png|webp, <=5 MB)." }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/albums/{{albumId}}/cover",
+              "host": [ "{{baseUrl}}" ],
+              "path": [ "api", "albums", "{{albumId}}", "cover" ]
+            },
+            "description": "Stores (replaces) the cover from a multipart/form-data upload (204); missing record returns 404."
+          }
+        }
+      ]
+    }
+  ]
+}

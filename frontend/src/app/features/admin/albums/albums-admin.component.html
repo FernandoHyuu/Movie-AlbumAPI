@@ -1,0 +1,141 @@
+<section class="admin-section" aria-labelledby="albums-heading">
+  <h2 id="albums-heading" class="admin-section__heading">Albums</h2>
+
+  <form class="admin-form" [formGroup]="form" (ngSubmit)="submit()">
+    <h3 class="admin-form__title">{{ isEditing() ? 'Edit album' : 'New album' }}</h3>
+
+    <div class="admin-form__grid">
+      <label class="admin-field">
+        <span class="admin-field__label">Title</span>
+        <input
+          type="text"
+          formControlName="title"
+          class="admin-field__input"
+          [attr.aria-invalid]="isInvalid('title') ? 'true' : null"
+        />
+        @if (isInvalid('title')) {
+          <span class="admin-field__error" role="alert">Title is required (max 200 characters).</span>
+        }
+      </label>
+
+      <label class="admin-field">
+        <span class="admin-field__label">Band</span>
+        <input
+          type="text"
+          formControlName="band"
+          class="admin-field__input"
+          [attr.aria-invalid]="isInvalid('band') ? 'true' : null"
+        />
+        @if (isInvalid('band')) {
+          <span class="admin-field__error" role="alert">Band must be at most 200 characters.</span>
+        }
+      </label>
+
+      <label class="admin-field">
+        <span class="admin-field__label">Release year</span>
+        <input
+          type="number"
+          formControlName="releaseYear"
+          class="admin-field__input"
+          [attr.aria-invalid]="isInvalid('releaseYear') ? 'true' : null"
+        />
+        @if (isInvalid('releaseYear')) {
+          <span class="admin-field__error" role="alert">Release year must be between 1888 and 2100.</span>
+        }
+      </label>
+
+      <label class="admin-field">
+        <span class="admin-field__label">Genre</span>
+        <input
+          type="text"
+          formControlName="genre"
+          class="admin-field__input"
+          [attr.aria-invalid]="isInvalid('genre') ? 'true' : null"
+        />
+        @if (isInvalid('genre')) {
+          <span class="admin-field__error" role="alert">Genre must be at most 200 characters.</span>
+        }
+      </label>
+
+      <label class="admin-field">
+        <span class="admin-field__label">Cover image (JPEG/PNG, ≤5 MB)</span>
+        <input
+          type="file"
+          accept="image/jpeg,image/png"
+          class="admin-field__input"
+          (change)="onFileSelected($event)"
+        />
+        @if (coverError()) {
+          <span class="admin-field__error" role="alert">{{ coverError() }}</span>
+        } @else if (selectedFile()) {
+          <span class="admin-field__hint">{{ selectedFile()!.name }}</span>
+        }
+      </label>
+    </div>
+
+    <div class="admin-form__actions">
+      <button type="submit" class="admin-btn admin-btn--primary" [disabled]="saving()">
+        {{ saving() ? 'Saving…' : isEditing() ? 'Update' : 'Create' }}
+      </button>
+      @if (isEditing()) {
+        <button type="button" class="admin-btn" (click)="resetForm()">Cancel</button>
+      }
+    </div>
+  </form>
+
+  @if (loading()) {
+    <p class="admin-table__status" role="status">Loading…</p>
+  } @else if (items().length === 0) {
+    <p class="admin-table__status" role="status">No albums found.</p>
+  } @else {
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th scope="col">Title</th>
+          <th scope="col">Band</th>
+          <th scope="col">Year</th>
+          <th scope="col">Genre</th>
+          <th scope="col">Cover</th>
+          <th scope="col">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (album of items(); track album.id) {
+          <tr>
+            <td>{{ album.title }}</td>
+            <td>{{ album.band || '—' }}</td>
+            <td>{{ album.releaseYear }}</td>
+            <td>{{ album.genre || '—' }}</td>
+            <td>{{ album.hasCover ? 'Yes' : 'No' }}</td>
+            <td class="admin-table__actions">
+              <button type="button" class="admin-btn admin-btn--ghost" (click)="edit(album)">Edit</button>
+              <button
+                type="button"
+                class="admin-btn admin-btn--danger"
+                [disabled]="saving()"
+                (click)="remove(album)"
+              >
+                Delete
+              </button>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+
+    <nav class="admin-pager" aria-label="Albums pages">
+      <button type="button" class="admin-btn" [disabled]="page() <= 1" (click)="goToPage(page() - 1)">
+        Previous
+      </button>
+      <span class="admin-pager__status">Page {{ page() }} of {{ totalPages() }}</span>
+      <button
+        type="button"
+        class="admin-btn"
+        [disabled]="page() >= totalPages()"
+        (click)="goToPage(page() + 1)"
+      >
+        Next
+      </button>
+    </nav>
+  }
+</section>

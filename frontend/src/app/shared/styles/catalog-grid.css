@@ -1,0 +1,43 @@
+/*
+ * Shared responsive catalog-grid rules (R18.1, R18.2, R18.3).
+ *
+ * The CatalogGridComponent (task 11.1) and the feature catalog views (task
+ * 12.2) should apply the `.catalog-grid` class to their card container so the
+ * column count tracks the viewport breakpoints below. Expressing the layout in
+ * pure CSS media queries means a breakpoint crossing reflows the existing DOM
+ * without re-instantiating cards, preserving scroll position and selection and
+ * re-rendering effectively instantly — well inside the 500 ms budget (R18.5).
+ *
+ * To use, either import this file in the component's styles or rely on it being
+ * loaded globally via styles.css.
+ */
+.catalog-grid {
+  display: grid;
+  gap: 1rem;
+  /* Mobile-first default (< 768 px): a single column (R18.3). */
+  grid-template-columns: 1fr;
+}
+
+/* Tablet range: 768–1023 px → 2–3 columns (R18.2). auto-fill with a 220 px
+   minimum yields 2 columns near 768 px and up to 3 as width approaches
+   1023 px, staying within the 2–3 column band. */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .catalog-grid {
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  }
+}
+
+/* Desktop range: ≥ 1024 px → at least 4 columns (R18.1). A fixed 4-column
+   floor guarantees the minimum; auto-fill adds further columns on very wide
+   viewports while never dropping below 4. */
+@media (min-width: 1024px) {
+  .catalog-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+@media (min-width: 1400px) {
+  .catalog-grid {
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  }
+}

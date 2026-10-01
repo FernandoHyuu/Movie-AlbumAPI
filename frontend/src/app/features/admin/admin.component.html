@@ -1,0 +1,57 @@
+@if (isAdmin()) {
+  <section class="admin" aria-labelledby="admin-heading">
+    <h1 id="admin-heading" class="admin__heading">Administration</h1>
+
+    <nav class="admin__tabs" role="tablist" aria-label="Management tables">
+      <button
+        type="button"
+        role="tab"
+        class="admin__tab"
+        [class.admin__tab--active]="activeTab() === 'persons'"
+        [attr.aria-selected]="activeTab() === 'persons'"
+        (click)="select('persons')"
+      >
+        Persons
+      </button>
+      <button
+        type="button"
+        role="tab"
+        class="admin__tab"
+        [class.admin__tab--active]="activeTab() === 'movies'"
+        [attr.aria-selected]="activeTab() === 'movies'"
+        (click)="select('movies')"
+      >
+        Movies
+      </button>
+      <button
+        type="button"
+        role="tab"
+        class="admin__tab"
+        [class.admin__tab--active]="activeTab() === 'albums'"
+        [attr.aria-selected]="activeTab() === 'albums'"
+        (click)="select('albums')"
+      >
+        Albums
+      </button>
+    </nav>
+
+    @switch (activeTab()) {
+      @case ('persons') {
+        <app-persons-admin />
+      }
+      @case ('movies') {
+        <app-movies-admin />
+      }
+      @case ('albums') {
+        <app-albums-admin />
+      }
+    }
+  </section>
+} @else {
+  <section class="admin admin--denied" role="alert" aria-labelledby="admin-denied-heading">
+    <h1 id="admin-denied-heading" class="admin__heading">Access denied</h1>
+    <p class="admin__denied-message">
+      Administrative privileges are required to view this page.
+    </p>
+  </section>
+}
